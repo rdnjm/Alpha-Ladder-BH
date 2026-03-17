@@ -12,6 +12,12 @@ We explored six categories of black hole observables, computed everything honest
 
 The real testable prediction was never about black holes. It is the sub-ppm prediction of G from fundamental constants: alpha^24 * mu * (mu - sqrt(phi) * (1 - alpha)) at -0.31 ppm with zero fitted parameters. That lives in the [main repo](https://github.com/rdnjm/Alpha-Ladder).
 
+## Live Dashboard
+
+Explore the full interactive dashboard at **[alpha-ladder-bh.streamlit.app](https://alpha-ladder-bh.streamlit.app/)**
+
+Pick a black hole mass, dial the charge ratio, and watch every observable respond in real time. Spoiler: none of it matters at realistic charge levels.
+
 ## The Quest Log
 
 | Page | Title | What happens |
