@@ -104,7 +104,7 @@ else:
             "**Key difference from Reissner-Nordstrom:** The extremal GM "
             "black hole (q -> 1) has FINITE temperature, unlike the RN "
             "extremal limit where T -> 0. This means GM black holes "
-            "evaporate completely -- no remnant.\n\n"
+            "reach T=0 at extremality (degenerate horizon at r+=r-=4M/3).\n\n"
             f"- r_+ = {temp_data['r_plus']:.6e} m\n"
             f"- r_- = {temp_data['r_minus']:.6e} m\n"
             f"- gamma = {temp_data['gamma']:.4f}"

@@ -56,21 +56,20 @@ def _gm_horizons(M_geom, q, a=None):
     """
     GM horizon radii in geometrized units.
 
-    r+ = M(1 + sqrt(1 - q^2))
-    r- = a^2 q^2 M / (1 + sqrt(1 - q^2))
+    Satisfies 2M = r+ + gamma*r-.  For a^2=1/3, gamma=1/2:
+        disc = 1 - 8q^2/9
+        r+ = M(1 + sqrt(disc))
+        r- = 2M(1 - sqrt(disc))
+    At q=1: r+=r-=4M/3.
     """
     if a is None:
         a = _A_DEFAULT
     a_sq = a * a
     q_eff = min(abs(q), 1.0)
-    disc = max(1.0 - q_eff * q_eff, 0.0)
+    disc = max(1.0 - 8.0 * q_eff * q_eff / 9.0, 0.0)
     sqrt_disc = math.sqrt(disc)
     r_plus = M_geom * (1.0 + sqrt_disc)
-    denom = 1.0 + sqrt_disc
-    if denom > 0.0:
-        r_minus = a_sq * q_eff * q_eff * M_geom / denom
-    else:
-        r_minus = a_sq * M_geom / (1.0 + a_sq)
+    r_minus = 2.0 * M_geom * (1.0 - sqrt_disc)
     gam = (1.0 - a_sq) / (1.0 + a_sq)
     return r_plus, r_minus, gam
 
@@ -392,7 +391,7 @@ def dilaton_effects_at_realistic_q(q_values=None):
     Compute GM dilaton deviations from Schwarzschild at each charge ratio.
 
     For small q, all GM metric deviations scale as q^2 because r_minus ~ q^2:
-        r_minus = a^2 q^2 M / (1 + sqrt(1 - q^2))  ~  a^2 q^2 M / 2  for q << 1
+        r_minus = 2M(1 - sqrt(1 - 8q^2/9))  ~  8q^2 M/9  for q << 1
 
     The leading-order deviations in shadow, ISCO, QNM frequency, and Hawking
     temperature are all proportional to q^2 (or higher powers), so for

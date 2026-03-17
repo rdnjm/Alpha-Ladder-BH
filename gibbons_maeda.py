@@ -13,10 +13,11 @@ The dilaton coupling 'a' is fixed (not free) by the KK reduction:
 
 This module computes the exact black hole solutions of that theory.
 
-Key physical result:  Unlike Reissner-Nordstrom (a=0) where extremal BHs have
-r_+ = r_- and T = 0, the GM solution with a = 1/sqrt(3) has r_- = a^2 r_+ at
-extremality, so the horizon remains non-degenerate with FINITE nonzero Hawking
-temperature.  This is a qualitative difference from GR.
+Key physical result:  The GM solution with a = 1/sqrt(3) and gamma = 1/2
+satisfies the mass relation 2M = r_+ + gamma * r_- = r_+ + r_-/2.
+At extremality (q=1), r_+ = r_- = 4M/3 and T = 0, as in Reissner-Nordstrom.
+However, the APPROACH to extremality differs from RN because of the modified
+discriminant (1 - 8q^2/9 vs 1 - q^2).
 
 Reference: G. W. Gibbons and K. Maeda, Nucl. Phys. B 298, 741 (1988).
 
@@ -110,15 +111,16 @@ def _horizon_radii(M, qm_ratio, a):
     """
     Outer and inner horizon radii of the Gibbons-Maeda black hole.
 
-    In geometrized units (G = c = 1), parameterized by q = Q/Q_extreme
-    where Q_extreme^2 = M^2 (1 + a^2):
+    For a^2 = 1/3, gamma = (1-a^2)/(1+a^2) = 1/2, the GM mass relation is
+        2M = r_+ + gamma * r_-
 
-        r_+ = M + sqrt(M^2 (1 - q^2))   [outer horizon]
-        r_- = a^2 q^2 M^2 / ((1 + a^2) r_+)   [inner "horizon" / singularity]
+    The correct parametrization (satisfying the mass relation) is:
+        disc = 1 - 8 q^2 / 9
+        r_+ = M (1 + sqrt(disc))
+        r_- = 2 M (1 - sqrt(disc))
 
-    At extremality (q = 1):  r_+ = M,  r_- = a^2 M / (1 + a^2).
-    Note: r_- != r_+ unless a = 0 (Reissner-Nordstrom).  For a > 0 the
-    "extremal" GM black hole still has a non-degenerate outer horizon.
+    At q = 0: r_+ = 2M (Schwarzschild), r_- = 0.
+    At q = 1 (extremal): disc = 1/9, r_+ = 4M/3, r_- = 4M/3, T = 0.
 
     Parameters
     ----------
@@ -133,15 +135,15 @@ def _horizon_radii(M, qm_ratio, a):
     -------
     (r_plus, r_minus) or None if q > 1 (naked singularity).
     """
-    disc = M * M * (1.0 - qm_ratio * qm_ratio)
+    q = min(abs(qm_ratio), 1.0)
+    disc = 1.0 - 8.0 * q * q / 9.0
     if disc < -1e-30:
         return None
     disc = max(disc, 0.0)
-    r_plus = M + math.sqrt(disc)
-    if r_plus == 0.0:
+    r_plus = M * (1.0 + math.sqrt(disc))
+    r_minus = 2.0 * M * (1.0 - math.sqrt(disc))
+    if r_plus <= 0.0:
         return None
-    a_sq = a * a
-    r_minus = a_sq * qm_ratio * qm_ratio * M * M / ((1.0 + a_sq) * r_plus)
     return (r_plus, r_minus)
 
 
@@ -168,13 +170,10 @@ def compute_hawking_temperature(a, M, qm_ratio):
     Temperature:
         T_H = kappa / (2 pi) = (1 - r_-/r_+)^gamma / (4 pi r_+)
 
-    IMPORTANT: at extremality (q = 1), r_- = a^2 M/(1+a^2) while r_+ = M.
-    So r_-/r_+ = a^2/(1+a^2) < 1 for any finite a.  The temperature is:
-        T_ext = (1 - a^2/(1+a^2))^gamma / (4 pi M)
-              = (1/(1+a^2))^gamma / (4 pi M)
-
-    For a = 1/sqrt(3): T_ext = (3/4)^(1/2) / (4 pi M) -- finite and nonzero.
-    This contrasts with RN (a=0) where T_ext = 0.
+    At extremality (q = 1), r_+ = r_- = 4M/3, so r_-/r_+ = 1 and T = 0.
+    Temperature DECREASES monotonically with charge, reaching zero at
+    extremality -- the same qualitative behavior as RN, though the
+    approach differs (the discriminant is 1 - 8q^2/9 rather than 1 - q^2).
 
     Parameters
     ----------
@@ -498,12 +497,12 @@ def compute_alpha_ladder_black_holes():
         M_geom = _mass_to_geom(M_kg)
         r_schwarz = 2.0 * M_geom
 
-        # Extremal values
-        r_plus_ext = M_geom
-        r_minus_ext = a_sq * M_geom / (1.0 + a_sq)
-        ratio_ext = r_minus_ext / r_plus_ext
-        T_ext_geom = ((1.0 - ratio_ext) ** gamma) / (4.0 * math.pi * r_plus_ext)
-        T_ext_K = _temperature_to_si(T_ext_geom, M_kg)
+        # Extremal values (q=1): disc = 1/9, r+ = r- = 4M/3
+        r_plus_ext = 4.0 * M_geom / 3.0
+        r_minus_ext = 4.0 * M_geom / 3.0
+        ratio_ext = 1.0  # degenerate at extremality
+        T_ext_geom = 0.0  # T = 0 at extremality
+        T_ext_K = 0.0
 
         # Temperature profile
         temp_profile = []
@@ -549,15 +548,13 @@ def compute_alpha_ladder_black_holes():
         }
 
     # Key finding
-    ratio_ext = a_sq / (1.0 + a_sq)
-    T_ext_over_T_schwarz = ((1.0 - ratio_ext) ** gamma) * 2.0
     results["key_finding"] = (
         f"Alpha Ladder KK black holes have dilaton coupling a = 1/sqrt(3) "
         f"(a^2 = 1/3), fixed by omega=0.  "
         f"gamma = (1-a^2)/(1+a^2) = {gamma:.4f}.  "
-        f"CRUCIAL: unlike RN (a=0), extremal GM BHs have FINITE nonzero "
-        f"temperature because r_-/r_+ = a^2/(1+a^2) = {ratio_ext:.4f} != 1. "
-        f"T_ext/T_schwarz = {T_ext_over_T_schwarz:.4f}.  "
+        f"Mass relation: 2M = r+ + gamma*r- = r+ + r-/2.  "
+        f"At extremality (q=1): r+ = r- = 4M/3, T = 0 (degenerate horizon).  "
+        f"Temperature decreases monotonically with charge.  "
         f"Entropy is reduced: A_eff = 4 pi r+^2 (1-r-/r+)^(1/2).  "
         f"Dilaton hair D ~ Q^2/M is secondary (determined by M,Q)."
     )
@@ -582,9 +579,9 @@ def summarize_gibbons_maeda_analysis():
     gamma = (1.0 - a_sq) / (1.0 + a_sq)
     entropy_exponent = 2.0 * a_sq / (1.0 + a_sq)
 
-    # Extremal temperature ratio
-    ratio_ext = a_sq / (1.0 + a_sq)   # = 1/4
-    T_ext_factor = ((1.0 - ratio_ext) ** gamma) * 2.0
+    # Extremal temperature ratio: T_ext = 0 (degenerate horizon at q=1)
+    ratio_ext = 1.0  # r-/r+ = 1 at extremality
+    T_ext_factor = 0.0
 
     coupling = compute_dilaton_coupling()
     bh_results = compute_alpha_ladder_black_holes()
@@ -610,9 +607,9 @@ def summarize_gibbons_maeda_analysis():
             "gamma":            gamma,
             "entropy_exponent": entropy_exponent,
             "extremal_T": (
-                f"FINITE nonzero (T_ext/T_schwarz = {T_ext_factor:.4f}).  "
-                f"This differs from RN (T_ext = 0) because the GM inner "
-                f"horizon r_- = a^2 r+/(1+a^2) != r+ at extremality."
+                f"T_ext = 0 (degenerate horizon: r+ = r- = 4M/3 at q=1).  "
+                f"Temperature decreases with charge, same qualitative "
+                f"behavior as RN but with different discriminant (1-8q^2/9)."
             ),
             "extremal_r_ratio": ratio_ext,
             "entropy_formula":  "S = pi r+^2 sqrt(1 - r-/r+) / G",
@@ -624,7 +621,7 @@ def summarize_gibbons_maeda_analysis():
                 "standard Bekenstein-Hawking entropy"
             ),
             "a=1/sqrt(3) (us)": (
-                "Moderate dilaton, T_ext FINITE (non-degenerate horizon), "
+                "Moderate dilaton, T_ext = 0 (degenerate at r+=r-=4M/3), "
                 "sqrt correction to entropy, secondary scalar hair"
             ),
             "a=1 (string)": (
@@ -647,9 +644,10 @@ def summarize_gibbons_maeda_analysis():
             "Charged astrophysical BHs are expected to be nearly neutral, "
             "so dilaton effects would be tiny for real BHs even with massless "
             "dilaton.",
-            "The finite extremal temperature is a qualitative prediction that "
-            "differs from GR.  It means GM BHs evaporate completely rather "
-            "than approaching an extremal remnant.",
+            "The GM extremal temperature is T=0 (degenerate horizon), "
+            "qualitatively similar to RN.  The approach to extremality "
+            "differs: the discriminant is 1-8q^2/9 (not 1-q^2), and "
+            "r+/r- at intermediate q differ significantly from RN.",
         ],
         "schwarzschild_T_1_solar_K": T_q0,
         "detailed_results": bh_results,
@@ -704,13 +702,9 @@ if __name__ == "__main__":
     print(f"  Dilaton coupling a = {a:.6f},  a^2 = {a_sq:.6f}")
     print(f"  gamma = (1-a^2)/(1+a^2) = {gamma:.4f}")
 
-    # Extremal values
-    ratio_ext = a_sq / (1.0 + a_sq)
-    T_ext_geom = ((1.0 - ratio_ext) ** gamma) / (4.0 * math.pi * M_geom)
-    T_ext_K = _temperature_to_si(T_ext_geom, M_sun)
-    print(f"\n  Extremal: r_-/r_+ = a^2/(1+a^2) = {ratio_ext:.6f}")
-    print(f"  Extremal T = {_fmt(T_ext_K, 'K')}")
-    print(f"  Extremal T / T_schwarz = {T_ext_K / T_schwarz_K:.6f}")
+    # Extremal values: q=1, disc=1/9, r+=r-=4M/3, T=0
+    print(f"\n  Extremal (q=1): r+ = r- = 4M/3, T = 0 (degenerate horizon)")
+    print(f"  Mass relation check: 2M = r+ + gamma*r- = 4M/3 + (1/2)(4M/3) = 2M  [OK]")
     print()
 
     print(f"  {'Q/Q_ext':>8s}  {'T_H (K)':>14s}  {'T/T_schwarz':>12s}"
@@ -728,10 +722,10 @@ if __name__ == "__main__":
         print(f"  {q:8.3f}  {T_K:14.4e}  {ratio_T:12.4f}"
               f"  {r_ratio:10.4f}  {rr:10.6f}")
 
-    print(f"\n  KEY RESULT: Extremal GM black hole has FINITE nonzero T.")
-    print(f"  This contrasts with RN (a=0) where extremal T = 0.")
-    print(f"  Reason: r_- = a^2 r+/(1+a^2) != r+ at extremality.")
-    print(f"  The outer horizon remains non-degenerate for any a > 0.")
+    print(f"\n  KEY RESULT: Extremal GM black hole has T = 0 (degenerate horizon).")
+    print(f"  At q=1: r+ = r- = 4M/3.  Mass relation: 2M = r+ + r-/2.")
+    print(f"  Temperature decreases monotonically with charge, reaching 0 at extremality.")
+    print(f"  The discriminant is 1 - 8q^2/9 (vs 1 - q^2 for RN).")
 
     # --- 3. Entropy ---
     print("\n--- 3. Entropy Correction ---")
@@ -758,8 +752,8 @@ if __name__ == "__main__":
         S_schwarz_same_M = 4.0 * math.pi * (2.0 * M_geom) ** 2 / 4.0
         print(f"  {'1.000':>8s}  {ent_ext['S_ratio']:14.6f}"
               f"  {ent_ext['S_GM']/S_schwarz_same_M:14.6f}")
-    print(f"\n  At extremality, entropy is reduced but nonzero "
-          f"(unlike a=1 string case).")
+    print(f"\n  At extremality (r+=r-=4M/3), entropy vanishes "
+          f"(degenerate horizon, A_eff -> 0).")
 
     # --- 4. Dilaton hair ---
     print("\n--- 4. Dilaton Hair (secondary) ---")

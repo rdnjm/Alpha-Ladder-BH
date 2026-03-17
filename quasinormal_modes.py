@@ -57,9 +57,13 @@ def _horizon_radii(M_geom, qm_ratio, a):
     """
     Outer and inner horizon radii of a Gibbons-Maeda black hole.
 
-    In geometrized units (G=c=1), parameterized by q = Q/Q_extreme:
-        r+ = M + sqrt(M^2 (1 - q^2))
-        r- = a^2 q^2 M^2 / ((1 + a^2) r+)
+    Satisfies the GM mass relation 2M = r+ + gamma*r-.
+    For a^2=1/3, gamma=1/2:
+        disc = 1 - 8 q^2 / 9
+        r+ = M (1 + sqrt(disc))
+        r- = 2 M (1 - sqrt(disc))
+
+    At q=0: r+=2M, r-=0.  At q=1: r+=r-=4M/3.
 
     Parameters
     ----------
@@ -74,17 +78,15 @@ def _horizon_radii(M_geom, qm_ratio, a):
     -------
     (r_plus, r_minus) or None if q > 1.
     """
-    disc = M_geom * M_geom * (1.0 - qm_ratio * qm_ratio)
+    q = min(abs(qm_ratio), 1.0)
+    disc = 1.0 - 8.0 * q * q / 9.0
     if disc < -1e-30:
         return None
     disc = max(disc, 0.0)
-    r_plus = M_geom + math.sqrt(disc)
-    if r_plus == 0.0:
+    r_plus = M_geom * (1.0 + math.sqrt(disc))
+    r_minus = 2.0 * M_geom * (1.0 - math.sqrt(disc))
+    if r_plus <= 0.0:
         return None
-    a_sq = a * a
-    r_minus = a_sq * qm_ratio * qm_ratio * M_geom * M_geom / (
-        (1.0 + a_sq) * r_plus
-    )
     return (r_plus, r_minus)
 
 

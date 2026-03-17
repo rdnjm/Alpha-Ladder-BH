@@ -6,8 +6,8 @@ A side quest from the [Alpha Ladder](https://github.com/rdnjm/Alpha-Ladder) fram
 
 We explored six categories of black hole observables, computed everything honestly, and the universe said "no" in three different ways:
 
-1. **Black holes are neutral.** Wald mechanism + Schwinger discharge keep q = Q/Q_ext below 10^-9. Every Gibbons-Maeda effect scales as q^2, pushing deviations below 10^-30 ppm. Not "hard to detect" -- literally unmeasurable by any instrument that could ever be built.
-2. **Cassini already settled this.** The massless dilaton predicts a PPN gamma that disagrees with GR by ~0.2. Cassini measured it to 2.3 x 10^-5. That is a 20,000-sigma exclusion. The dilaton must be massive.
+1. **Black holes are neutral.** Wald mechanism + Schwinger discharge keep q = Q/Q_ext below 10^-9. Every Gibbons-Maeda effect scales as q^2, pushing deviations below 10^-13 ppm. Not "hard to detect" -- literally unmeasurable by any instrument that could ever be built.
+2. **Cassini already settled this.** The massless dilaton predicts |gamma_PPN - 1| = 0.5. Cassini measured it to 2.3 x 10^-5. That is a 20,000-sigma exclusion. The dilaton must be massive.
 3. **Our own framework finishes the job.** Alpha Ladder flux stabilization gives the dilaton a Planck-scale mass (~6.3 x 10^29 eV). At that mass it decouples from everything, and all black hole solutions quietly revert to standard GR.
 
 The real testable prediction was never about black holes. It is the sub-ppm prediction of G from fundamental constants: alpha^24 * mu * (mu - sqrt(phi) * (1 - alpha)) at -0.31 ppm with zero fitted parameters. That lives in the [main repo](https://github.com/rdnjm/Alpha-Ladder).
@@ -25,7 +25,7 @@ Pick a black hole mass, dial the charge ratio, and watch every observable respon
 | 00 | Overview | The map and the spoiler |
 | 01 | Gibbons-Maeda | We meet the boss: exact charged dilaton BH metric, horizons, thermodynamics |
 | 02 | Quasinormal Modes | We listen to the ringdown. LIGO cannot hear the difference. |
-| 03 | Shadows & EHT | The shadow shrinks 50% faster than RN. EHT still cannot tell. |
+| 03 | Shadows & EHT | The shadow shrinks ~34% faster than RN. EHT still cannot tell. |
 | 04 | ISCO & Accretion | Orbits shift, efficiency changes. At q ~ 0, nobody notices. |
 | 05 | Observational Constraints | Cassini delivers the killing blow |
 | 06 | Greybody & Hawking | The dilaton emission channel is kinematically blocked. Door shut. |
@@ -70,8 +70,9 @@ The dashboard launches in wide layout with an interactive sidebar for picking yo
 ## What We Learned Along the Way
 
 - **Dilaton coupling:** a = 1/sqrt(3), pinned by the omega = 0 reduction. Not negotiable.
-- **Finite extremal temperature:** GM black holes keep radiating at extremality. RN black holes freeze. Nature chose neither for real black holes (q ~ 0), so this is trivia.
-- **Shadow shrinkage:** ~50% faster than Reissner-Nordstrom. A beautiful theoretical result that astrophysics renders moot.
+- **Correct horizon relation:** 2M = r+ + gamma*r-, giving r+ = M(1 + sqrt(1 - 8q^2/9)) and r- = 2M(1 - sqrt(1 - 8q^2/9)). At extremality (q=1): r+ = r- = 4M/3, T = 0.
+- **Zero extremal temperature:** Like RN, GM black holes cool to zero at extremality. The approach differs (the 8/9 discriminant factor vs 1 for RN) but the endpoint is the same. Earlier versions of this repo incorrectly claimed T_ext = sqrt(3)*T_schwarz due to a wrong horizon parametrization -- that has been corrected.
+- **Shadow shrinkage:** ~34% faster than Reissner-Nordstrom at the same charge. A real theoretical result that astrophysics renders moot.
 - **Everything scales as q^2:** Which means everything scales as (basically zero)^2.
 - **Dilaton channel blocked:** Planck-mass dilaton cannot fit through the Hawking emission window. Kinematically forbidden.
 

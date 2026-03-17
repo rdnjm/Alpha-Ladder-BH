@@ -26,10 +26,12 @@ The GM metric:
 
 where gamma = (1 - a^2)/(1 + a^2).  For a = 1/sqrt(3): gamma = 1/2.
 
-IMPORTANT inner horizon formula (NOT the RN one):
-    r+ = M (1 + sqrt(1 - q^2))
-    r- = a^2 q^2 M / (1 + sqrt(1 - q^2))
-where q = Q/Q_ext in [0, 1].
+IMPORTANT: The GM horizon parametrization satisfies 2M = r+ + gamma*r-.
+For a^2 = 1/3, gamma = 1/2:
+    disc = 1 - 8 q^2 / 9
+    r+ = M (1 + sqrt(disc))
+    r- = 2 M (1 - sqrt(disc))
+where q = Q/Q_ext in [0, 1].  At q=1: r+ = r- = 4M/3.
 
 References:
     G. W. Gibbons and K. Maeda, Nucl. Phys. B 298, 741 (1988).
@@ -73,21 +75,21 @@ def _gamma(a):
 
 def _horizons(M, q, a):
     """
-    Compute GM horizon radii.
+    Compute GM horizon radii satisfying 2M = r+ + gamma*r-.
+
+    For a^2=1/3, gamma=1/2:
+        disc = 1 - 8q^2/9
+        r+ = M(1 + sqrt(disc)),  r- = 2M(1 - sqrt(disc))
 
     Returns (r_plus, r_minus, gamma).
     """
     a_sq = a * a
     gam = _gamma(a)
     q_eff = min(q, 1.0)
-    disc = max(1.0 - q_eff * q_eff, 0.0)
+    disc = max(1.0 - 8.0 * q_eff * q_eff / 9.0, 0.0)
     sqrt_disc = math.sqrt(disc)
     r_plus = M * (1.0 + sqrt_disc)
-    denom = 1.0 + sqrt_disc
-    if denom > 0.0:
-        r_minus = a_sq * q_eff * q_eff * M / denom
-    else:
-        r_minus = a_sq * M / (1.0 + a_sq)
+    r_minus = 2.0 * M * (1.0 - sqrt_disc)
     return r_plus, r_minus, gam
 
 

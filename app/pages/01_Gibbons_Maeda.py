@@ -137,11 +137,10 @@ else:
     st.markdown(
         '<div class="bh-theory">'
         "<p><strong>GM horizons vs RN:</strong> "
-        "In Reissner-Nordstrom (a = 0), extremal black holes have r\u208a = r\u208b "
-        "(degenerate horizon). In the Gibbons-Maeda solution with a = 1/\u221a3, "
-        "the inner horizon is r\u208b = a\u00b2 q\u00b2 M\u00b2 / ((1 + a\u00b2) r\u208a), which is always "
-        "less than r\u208a even at extremality. This non-degeneracy is the root cause "
-        "of the finite extremal temperature.</p>"
+        "The GM horizon parametrization satisfies 2M = r\u208a + \u03b3 r\u208b.  "
+        "For a = 1/\u221a3, \u03b3 = 1/2: disc = 1 \u2212 8q\u00b2/9, "
+        "r\u208a = M(1 + \u221adisc), r\u208b = 2M(1 \u2212 \u221adisc).  "
+        "At extremality (q=1): r\u208a = r\u208b = 4M/3 and T = 0 (degenerate horizon).</p>"
         "</div>",
         unsafe_allow_html=True,
     )
@@ -171,9 +170,9 @@ st.markdown(
     "<p><strong>Key result:</strong> Extremal Gibbons-Maeda black holes have "
     "FINITE nonzero Hawking temperature, unlike Reissner-Nordstrom where "
     "T_ext = 0. For a = 1/\u221a3, the extremal temperature ratio is "
-    "T_ext / T_Schwarz = (3/4)^(1/2) * 2 ~ 1.732. "
-    "This means GM black holes evaporate completely rather than approaching "
-    "a zero-temperature remnant.</p>"
+    "At extremality (q=1), T = 0 because r\u208a = r\u208b = 4M/3 "
+    "(degenerate horizon). The approach to extremality differs from RN: "
+    "the GM discriminant is 1 \u2212 8q\u00b2/9 rather than 1 \u2212 q\u00b2.</p>"
     "</div>",
     unsafe_allow_html=True,
 )

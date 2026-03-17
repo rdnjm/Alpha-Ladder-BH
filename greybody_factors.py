@@ -29,7 +29,7 @@ Key physics:
   - Greybody factors suppress low-frequency emission (barrier reflection)
   - GM black holes have modified barriers due to gamma=1/2 (not gamma=1)
   - Extra dilaton emission channel if dilaton is massless
-  - Finite extremal temperature means complete evaporation (no remnant)
+  - T -> 0 at extremality (degenerate horizon at r+=r-=4M/3)
   - For q=0: reduces to Schwarzschild identically
 
 Reference: G. W. Gibbons and K. Maeda, Nucl. Phys. B 298, 741 (1988).
@@ -63,9 +63,13 @@ def _horizon_radii(M_geom, qm_ratio, a):
     """
     Outer and inner horizon radii of a Gibbons-Maeda black hole.
 
-    In geometrized units (G=c=1), parameterized by q = Q/Q_extreme:
-        r+ = M + sqrt(M^2 (1 - q^2))
-        r- = a^2 q^2 M^2 / ((1 + a^2) r+)
+    Satisfies the GM mass relation 2M = r+ + gamma*r-.
+    For a^2=1/3, gamma=1/2:
+        disc = 1 - 8 q^2 / 9
+        r+ = M (1 + sqrt(disc))
+        r- = 2 M (1 - sqrt(disc))
+
+    At q=0: r+=2M, r-=0.  At q=1: r+=r-=4M/3.
 
     Parameters
     ----------
@@ -80,17 +84,15 @@ def _horizon_radii(M_geom, qm_ratio, a):
     -------
     (r_plus, r_minus) or None if q > 1.
     """
-    disc = M_geom * M_geom * (1.0 - qm_ratio * qm_ratio)
+    q = min(abs(qm_ratio), 1.0)
+    disc = 1.0 - 8.0 * q * q / 9.0
     if disc < -1e-30:
         return None
     disc = max(disc, 0.0)
-    r_plus = M_geom + math.sqrt(disc)
-    if r_plus == 0.0:
+    r_plus = M_geom * (1.0 + math.sqrt(disc))
+    r_minus = 2.0 * M_geom * (1.0 - math.sqrt(disc))
+    if r_plus <= 0.0:
         return None
-    a_sq = a * a
-    r_minus = a_sq * qm_ratio * qm_ratio * M_geom * M_geom / (
-        (1.0 + a_sq) * r_plus
-    )
     return (r_plus, r_minus)
 
 
@@ -1179,9 +1181,10 @@ def summarize_greybody_analysis():
             peaks.get(2, {}).get("V_peak", 0.0)
         ),
 
-        "3. TEMPERATURE ENHANCEMENT: For q=0.5, T_H/T_schwarz = {:.4f}.  "
-        "   The finite extremal temperature ({:.6f}/M for q=0.99) means GM BHs "
-        "   radiate even at extremality.".format(
+        "3. TEMPERATURE: For q=0.5, T_H/T_schwarz = {:.4f}.  "
+        "   Temperature decreases with charge; at extremality (q=1), T=0 "
+        "   (degenerate horizon at r+=r-=4M/3).  Near-extremal T ({:.6f}/M "
+        "   at q=0.99) is small but nonzero.".format(
             temp.get("ratio_T_H_over_T_schwarz", 0.0),
             temp_extremal.get("T_H_geom", 0.0)
         ),

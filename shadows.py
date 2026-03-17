@@ -16,10 +16,12 @@ The GM metric in Einstein frame:
 
 where gamma = (1 - a^2)/(1 + a^2).  For a = 1/sqrt(3): gamma = 1/2.
 
-IMPORTANT: The GM inner horizon is NOT the RN inner horizon.
-    r+ = M (1 + sqrt(1 - q^2))
-    r- = a^2 q^2 M / (1 + sqrt(1 - q^2))
-where q = Q/Q_ext with Q_ext^2 = M^2 (1 + a^2).
+IMPORTANT: The GM horizon parametrization satisfies 2M = r+ + gamma*r-.
+For a^2 = 1/3, gamma = 1/2:
+    disc = 1 - 8 q^2 / 9
+    r+ = M (1 + sqrt(disc))
+    r- = 2 M (1 - sqrt(disc))
+where q = Q/Q_ext.  At q=1: r+ = r- = 4M/3.
 
 The photon sphere radius r_ph solves d/dr[f(r)/R(r)^2] = 0.
 The critical impact parameter is b_c = R(r_ph) / sqrt(f(r_ph)).
@@ -213,21 +215,18 @@ def gm_horizons(M, q, a=None):
     extremal = (q >= 1.0)
 
     q_eff = min(q, 1.0)
-    disc = 1.0 - q_eff * q_eff
-    disc = max(disc, 0.0)
-    sqrt_disc = math.sqrt(disc)
 
-    # GM horizons
-    r_plus = M * (1.0 + sqrt_disc)
-    denom = 1.0 + sqrt_disc
-    if denom > 0.0:
-        r_minus = a_sq * q_eff * q_eff * M / denom
-    else:
-        r_minus = a_sq * M / (1.0 + a_sq)
+    # GM horizons: 2M = r+ + gamma*r-, disc = 1 - 8q^2/9
+    disc_gm = max(1.0 - 8.0 * q_eff * q_eff / 9.0, 0.0)
+    sqrt_disc_gm = math.sqrt(disc_gm)
+    r_plus = M * (1.0 + sqrt_disc_gm)
+    r_minus = 2.0 * M * (1.0 - sqrt_disc_gm)
 
     # RN horizons for comparison (a = 0 limit)
-    r_plus_rn = M * (1.0 + sqrt_disc)
-    r_minus_rn = M * (1.0 - sqrt_disc)
+    disc_rn = max(1.0 - q_eff * q_eff, 0.0)
+    sqrt_disc_rn = math.sqrt(disc_rn)
+    r_plus_rn = M * (1.0 + sqrt_disc_rn)
+    r_minus_rn = M * (1.0 - sqrt_disc_rn)
 
     return {
         "r_plus":       r_plus,
@@ -704,7 +703,7 @@ def summarize_shadow_analysis():
             "current constraints on q are weak.",
             "The shadow size depends on both mass and charge; degeneracies "
             "with mass uncertainty limit the constraining power.",
-            "For a = 1/sqrt(3) the shadow shrinks ~50% faster with charge "
+            "For a = 1/sqrt(3) the shadow shrinks ~34% faster with charge "
             "than for RN (a=0), providing a distinctive signature if "
             "precision improves.",
         ],
@@ -766,8 +765,8 @@ if __name__ == "__main__":
         print(f"  {q:6.2f}  {hz['r_plus']:8.4f}  {hz['r_minus']:10.6f}  "
               f"{hz['r_plus_rn']:8.4f}  {hz['r_minus_rn']:10.6f}  "
               f"{ratio_str:>12s}")
-    print(f"\n  GM r- = a^2 * r-_RN = (1/3) * r-_RN for all q.")
-    print(f"  At extremality: r+_GM = M, r-_GM = {a_sq/(1.0+a_sq):.4f} M "
+    print(f"\n  GM horizons use disc = 1 - 8q^2/9, satisfying 2M = r+ + r-/2.")
+    print(f"  At extremality: r+_GM = r-_GM = 4M/3 = {4.0/3.0:.4f} M "
           f"(vs r-_RN = M).")
 
     # --- 2. Photon sphere ---
@@ -846,7 +845,7 @@ if __name__ == "__main__":
         print(f"    GM shadow: {row_05['delta_gm_percent']:.2f}% vs Schwarzschild")
         print(f"    RN shadow: {row_05['delta_rn_percent']:.2f}% vs Schwarzschild")
         print(f"    GM/RN = {row_05['gm_vs_rn_ratio']:.6f}")
-        print(f"    Dilaton amplifies shadow shrinkage by ~50% vs RN.")
+        print(f"    Dilaton amplifies shadow shrinkage by ~34% vs RN.")
 
     # --- 5. EHT constraints ---
     print("\n--- 5. EHT Constraints ---")
@@ -874,7 +873,7 @@ if __name__ == "__main__":
     if row_05:
         print(f"  2. At q = 0.5: shadow shrinks by {abs(row_05['delta_gm_percent']):.1f}% "
               f"(GM) vs {abs(row_05['delta_rn_percent']):.1f}% (RN).")
-        print("     The dilaton amplifies the shadow shrinkage by ~50%.")
+        print("     The dilaton amplifies the shadow shrinkage by ~34%.")
     print()
     print("  3. EHT constraints:")
     for key in ["sgra", "m87"]:

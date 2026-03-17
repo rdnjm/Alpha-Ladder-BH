@@ -117,7 +117,7 @@ with tab_sgra:
     st.markdown(
         '<div class="bh-result">'
         "<p><strong>Key observation:</strong> The Gibbons-Maeda shadow shrinks "
-        "approximately 50% faster with charge than the Reissner-Nordstrom shadow. "
+        "approximately 34% faster with charge than the Reissner-Nordstrom shadow. "
         "This is because the dilaton modifies the areal radius R(r)\u00b2 = "
         "r\u00b2 (1 \u2212 r\u208b/r)^(1 \u2212 \u03b3), which affects the critical impact "
         "parameter b_c more strongly than in the a = 0 case.</p>"
